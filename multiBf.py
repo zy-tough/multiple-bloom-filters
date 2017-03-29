@@ -1,6 +1,7 @@
 """
 Author: Zhou You
 Module: multiple bloom filters for hot/cold data idenfication
+
 """
 
 import bloomFilter as bf
@@ -8,7 +9,7 @@ import sys
 import gl
 #import random
 
-PRINT_ENABLE = 0
+PRINT_ENABLE = 1
 
 class multiBloomFilter:
     
@@ -37,6 +38,7 @@ class multiBloomFilter:
         self.keySet       = {}
         self.hotKeySet    = {}
         if PRINT_ENABLE:
+            print("### Initial weights", end="")
             print(self.weights)
             
     def initBloomFilter(self, bitSize=2048, hashNum=2):
@@ -53,6 +55,7 @@ class multiBloomFilter:
                     sys.exit()
                 self.weights[i] = self.bfNum
         if PRINT_ENABLE:
+            print("### After decay, weights", end="")
             print(self.weights)
         # reset decayBF 
         self.bloomfilters[self.decBf].resetBf()
@@ -93,7 +96,9 @@ class multiBloomFilter:
         if self.countWeight(key) >= self.hotThres:
             self.hotKeySet[key] = gl.HOT
             if PRINT_ENABLE:
+                print("-----hot-------")
                 self.printHitBf(key)
+                print("---------------")
             return gl.HOT
         else:
             return gl.COLD
@@ -134,21 +139,12 @@ if __name__ == "__main__":
             testLpn.append(random.choice(range(8, 32)))
     """
     if PRINT_ENABLE:
+        print("TEST LPNs:")
         print(testLpn)
     for key in testLpn:
         mBFs.handleReq(key)
-		mBFs.checkHot(key)
+        mBFs.checkHot(key)
         
     mBFs.displayKey()
-
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+   
+     
