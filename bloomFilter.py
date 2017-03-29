@@ -12,12 +12,15 @@ class BloomFilter(object):
     def __init__(self, bitSize=2048, hashNum=2):
         """Initializes a BloomFilter() object:
             Expects:
-                bitSize: filter size in bits
+                bitSize:  filter size in bits
                 hashNum (int): for the number of hashes to perform"""
-        self.bitcount = bitSize
+        self.bitSize = bitSize
         byteSize = bitSize >> 3
-        self.filter = bytearray(byteSize)    # The filter itself
-        self.hashNum = hashNum                  # The number of hashes to use
+        self.filter  = bytearray(byteSize)    # The filter itself
+        self.hashNum = hashNum                # The number of hashes to use
+        
+    def getByteSize(self):
+        return len((self.filter)) 
 
     def _hash(self, value):
         """Creates a hash of an int and yields a generator of hash functions
@@ -32,7 +35,7 @@ class BloomFilter(object):
             digest = hf.hashFunctions[i](value)
             # bitwise AND of the digest and all of the available bit positions 
             # in the filter
-            yield digest & (self.bitcount - 1)
+            yield (digest & (self.bitSize - 1))
             
 
     def add(self, value):
@@ -55,9 +58,11 @@ class BloomFilter(object):
             for digest in self._hash(value))
         
     def resetBf(self):
-        self.filter[:] = b'\x00' * len((self.filter))
+        for i in range(len((self.filter))):
+            self.filter[i] &= 0x00
         
     def displayFilter(self):
+        print("BF byte number: %d" % len((self.filter)))
         for i in range(len((self.filter))):
             print((self.filter)[i], end="")
         print()
@@ -73,6 +78,9 @@ if __name__ == "__main__":
     bf.add(1230213)
     print("add 1230213")
     bf.displayFilter()
+    bf.add(28)
+    print("add 28")
+    bf.displayFilter()
     bf.add(1)
     print("add 1")
     bf.displayFilter()
@@ -80,3 +88,5 @@ if __name__ == "__main__":
     print(bf.query(1)) # True
     print(bf.query(1230213)) # True
     print(bf.query(12)) # False
+    bf.resetBf()
+    bf.displayFilter()
